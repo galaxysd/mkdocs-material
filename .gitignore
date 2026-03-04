@@ -68,3 +68,6 @@ tmp
 
 # uv Python package manager
 uv.lock
+# pixi environments
+.pixi/*
+!.pixi/config.toml

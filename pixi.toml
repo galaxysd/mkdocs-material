@@ -1,0 +1,67 @@
+[workspace]
+authors = ["HU Xuesong <87519979+huxs001@users.noreply.github.com>"]
+channels = ["conda-forge"]
+name = "mkdocs-material"
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+version = "0.1.0"
+
+[tasks]
+_install-ext = "pixi install -e ext"
+
+[dependencies]
+mkdocs-material-extensions = ">=1.3.1,<2"
+mkdocs = ">=1.6.1,<2"
+pygments = ">=2.19.2,<3"
+pymdown-extensions = ">=10.21.1,<11"
+jinja2 = ">=3.1.6,<4"
+markdown = ">=3.10.2,<4"
+
+[feature.build.dependencies]
+nodejs = "24.*"
+hatchling = ">=1.28.0,<2"
+hatch-nodejs-version = ">=0.4.0,<0.5"
+hatch-requirements-txt = ">=0.4.1,<0.5"
+trove-classifiers = ">=2026.1.14.14,<2027"
+python-build = ">=1.4.0,<2"
+
+[feature.build.target.linux-64.dependencies]
+pngquant = ">=2.16.0,<3"
+
+[feature.extra]
+platforms = ["osx-64", "linux-64"]
+
+[feature.extra.dependencies]
+pngquant = ">=2.16.0,<3"
+
+[feature.build.target.osx-arm64.tasks._link]
+depends-on = ["_install-ext"]
+cmd = "ln -sf ../../ext/bin/pngquant .pixi/envs/default/bin/; ls -l .pixi/envs/default/bin/pngquant"
+
+[feature.build.tasks]
+bldwhl = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
+
+[feature.recommended.dependencies]
+mkdocs-redirects = ">=1.2.1,<2"
+
+[feature.recommended.pypi-dependencies]
+mkdocs-rss-plugin = ">=1.17.9, <2"
+mkdocs-minify-plugin = ">=0.8.0, <0.9"
+
+[feature.git.dependencies]
+mkdocs-git-committers-plugin-2 = ">=2.5.0,<3"
+mkdocs-git-revision-date-localized-plugin = ">=1.2.9,<2"
+
+[feature.imaging.dependencies]
+pillow = ">=12.1.1,<13"
+cairosvg = ">=2.8.2,<3"
+
+[feature.plugins.dependencies]
+colorama = ">=0.4.6,<0.5"
+babel = ">=2.18.0,<3"
+paginate = ">=0.5.7,<0.6"
+backrefs = ">=6.2,<7"
+requests = ">=2.32.5,<3"
+
+[environments]
+default = ["plugins", "build", "recommended", "git", "imaging"]
+ext = { features = ["extra"], no-default-feature = true }
