@@ -38,7 +38,10 @@ depends-on = ["_install-ext"]
 cmd = "ln -sf ../../ext/bin/pngquant .pixi/envs/default/bin/; ls -l .pixi/envs/default/bin/pngquant"
 
 [feature.build.tasks]
-bldwhl = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
+npmci = { cmd="npm ci",inputs=["package-lock.json"],outputs=["node_modules"] }
+npmbld = { cmd="npm run build",depends-on=["_link","npmci"] }
+npmall = { cmd="npm run build:all",depends-on=["_link","npmci"] }
+whlbld = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
 
 [feature.recommended.dependencies]
 mkdocs-redirects = ">=1.2.1,<2"
