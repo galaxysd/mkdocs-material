@@ -42,6 +42,7 @@ npmci = { cmd="npm ci",inputs=["package-lock.json"],outputs=["node_modules"] }
 npmbld = { cmd="npm run build",depends-on=["_link","npmci"] }
 npmall = { cmd="npm run build:all",depends-on=["_link","npmci"] }
 whlbld = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
+checkout = "git checkout material/templates/.icons/material/LICENSE material/overrides/assets/javascripts/iconsearch_index.json"
 
 [feature.recommended.dependencies]
 mkdocs-redirects = ">=1.2.1,<2"
@@ -66,5 +67,6 @@ backrefs = ">=6.2,<7"
 requests = ">=2.32.5,<3"
 
 [environments]
-default = ["plugins", "build", "recommended", "git", "imaging"]
+bld = { features = ["build"], no-default-feature = true, solve-group = "py" }
 ext = { features = ["extra"], no-default-feature = true }
+default = { features = ["plugins", "recommended", "git", "imaging"], solve-group = "py" }
