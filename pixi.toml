@@ -7,6 +7,7 @@ version = "0.1.0"
 
 [tasks]
 _install-ext = "pixi install -e ext"
+ins = "pip show mkdocs-material || pip install -e ."
 
 [dependencies]
 mkdocs-material-extensions = ">=1.3.1,<2"
@@ -15,6 +16,7 @@ pygments = ">=2.19.2,<3"
 pymdown-extensions = ">=10.21.1,<11"
 jinja2 = ">=3.1.6,<4"
 markdown = ">=3.10.2,<4"
+pip = ">=26.0.1,<27"
 
 [feature.build.dependencies]
 nodejs = "24.*"
@@ -42,7 +44,8 @@ npmci = { cmd="npm ci",inputs=["package-lock.json"],outputs=["node_modules"] }
 npmbld = { cmd="npm run build",depends-on=["_link","npmci"] }
 npmall = { cmd="npm run build:all",depends-on=["_link","npmci"] }
 whlbld = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
-checkout = "git checkout material/templates/.icons/material/LICENSE material/overrides/assets/javascripts/iconsearch_index.json"
+_checkout = "git checkout material/templates/.icons/material/LICENSE material/overrides/assets/javascripts/iconsearch_index.json"
+gs = { cmd = "git status", depends-on = ["_checkout"] }
 
 [feature.recommended.dependencies]
 mkdocs-redirects = ">=1.2.1,<2"
