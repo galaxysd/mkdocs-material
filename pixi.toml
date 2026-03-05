@@ -7,6 +7,7 @@ version = "0.1.0"
 
 [tasks]
 ins = "pip show mkdocs-material || pip install -e ."
+bld = [{ task = "npmall" }, { task = "_renormalize" }]
 
 [dependencies]
 mkdocs-material-extensions = ">=1.3.1,<2"
@@ -17,6 +18,22 @@ jinja2 = ">=3.1.6,<4"
 markdown = ">=3.10.2,<4"
 pip = ">=26.0.1,<27"
 
+[target.linux-64.dependencies]
+pngquant = ">=2.16.0,<3"
+
+[target.osx-64.dependencies]
+pngquant = ">=2.16.0,<3"
+
+[target.osx-arm64.tasks]
+_install-ext = "pixi install -e ext"
+link = { cmd = "ln -sf ../../ext/bin/pngquant .pixi/envs/default/bin/; ls -l .pixi/envs/default/bin/pngquant", depends-on = ["_install-ext"] }
+
+[feature.extra]
+platforms = ["osx-64"]
+
+[feature.extra.dependencies]
+pngquant = ">=2.16.0,<3"
+
 [feature.build.dependencies]
 nodejs = "24.*"
 hatchling = ">=1.28.0,<2"
@@ -26,24 +43,11 @@ trove-classifiers = ">=2026.1.14.14,<2027"
 python-build = ">=1.4.0,<2"
 pymdown-extensions = ">=10.21.1,<11"
 
-[feature.build.target.linux-64.dependencies]
-pngquant = ">=2.16.0,<3"
-
-[feature.extra]
-platforms = ["osx-64", "linux-64"]
-
-[feature.extra.dependencies]
-pngquant = ">=2.16.0,<3"
-
-[feature.build.target.osx-arm64.tasks]
-_install-ext = "pixi install -e ext"
-_link = { cmd = "ln -sf ../../ext/bin/pngquant .pixi/envs/default/bin/; ls -l .pixi/envs/default/bin/pngquant", depends-on = ["_install-ext"] }
-
 [feature.build.tasks]
 npmci = { cmd="npm ci",inputs=["package-lock.json"],outputs=["node_modules"] }
 _twemoji_db = { cmd = "mkdir -p venv/lib/python3/site-packages/pymdownx/; ln -sf $(python -c 'import pymdownx.twemoji_db,inspect;print(inspect.getfile(pymdownx.twemoji_db))') venv/lib/python3/site-packages/pymdownx/", outputs=["venv/lib/python3/site-packages/pymdownx/twemoji_db.py"] }
-npmbld = { cmd="npm run build",depends-on=["_link","npmci"] }
-npmall = { cmd="npm run build:all",depends-on=["_link","_twemoji_db","npmci"] }
+npmbld = { cmd="npm run build",depends-on=["npmci"] }
+npmall = { cmd="npm run build:all",depends-on=["_twemoji_db","npmci"] }
 whlbld = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
 _renormalize = "git add --renormalize ."
 gs = { cmd = "git status", depends-on = ["_renormalize"] }
@@ -71,6 +75,6 @@ backrefs = ">=6.2,<7"
 requests = ">=2.32.5,<3"
 
 [environments]
+default = { features = ["plugins", "recommended", "git", "imaging"], solve-group = "py" }
 bld = { features = ["build"], no-default-feature = true, solve-group = "py" }
 ext = { features = ["extra"], no-default-feature = true }
-default = { features = ["plugins", "recommended", "git", "imaging"], solve-group = "py" }
