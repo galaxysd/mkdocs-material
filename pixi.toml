@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [tasks]
 ins = "pip show mkdocs-material || pip install -e ."
-bld = [{ task = "npmall" }, { task = "_renormalize" }]
+bld = [{ task = "npmall" }]
 
 [dependencies]
 mkdocs-material-extensions = ">=1.3.1,<2"
@@ -51,6 +51,7 @@ npmall = { cmd="npm run build:all",depends-on=["_twemoji_db","npmci"] }
 whlbld = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
 _renormalize = "git add --renormalize ."
 gs = { cmd = "git status", depends-on = ["_renormalize"] }
+gd = { cmd = "git diff --cached", depends-on = ["_renormalize"] }
 
 [feature.recommended.dependencies]
 mkdocs-redirects = ">=1.2.1,<2"
