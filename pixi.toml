@@ -6,7 +6,6 @@ platforms = ["osx-arm64", "osx-64", "linux-64"]
 version = "0.1.0"
 
 [tasks]
-_install-ext = "pixi install -e ext"
 ins = "pip show mkdocs-material || pip install -e ."
 
 [dependencies]
@@ -25,6 +24,7 @@ hatch-nodejs-version = ">=0.4.0,<0.5"
 hatch-requirements-txt = ">=0.4.1,<0.5"
 trove-classifiers = ">=2026.1.14.14,<2027"
 python-build = ">=1.4.0,<2"
+pymdown-extensions = ">=10.21.1,<11"
 
 [feature.build.target.linux-64.dependencies]
 pngquant = ">=2.16.0,<3"
@@ -35,17 +35,18 @@ platforms = ["osx-64", "linux-64"]
 [feature.extra.dependencies]
 pngquant = ">=2.16.0,<3"
 
-[feature.build.target.osx-arm64.tasks._link]
-depends-on = ["_install-ext"]
-cmd = "ln -sf ../../ext/bin/pngquant .pixi/envs/default/bin/; ls -l .pixi/envs/default/bin/pngquant"
+[feature.build.target.osx-arm64.tasks]
+_install-ext = "pixi install -e ext"
+_link = { cmd = "ln -sf ../../ext/bin/pngquant .pixi/envs/default/bin/; ls -l .pixi/envs/default/bin/pngquant", depends-on = ["_install-ext"] }
 
 [feature.build.tasks]
 npmci = { cmd="npm ci",inputs=["package-lock.json"],outputs=["node_modules"] }
+_twemoji_db = { cmd = "mkdir -p venv/lib/python3/site-packages/pymdownx/; ln -sf $(python -c 'import pymdownx.twemoji_db,inspect;print(inspect.getfile(pymdownx.twemoji_db))') venv/lib/python3/site-packages/pymdownx/", outputs=["venv/lib/python3/site-packages/pymdownx/twemoji_db.py"] }
 npmbld = { cmd="npm run build",depends-on=["_link","npmci"] }
-npmall = { cmd="npm run build:all",depends-on=["_link","npmci"] }
+npmall = { cmd="npm run build:all",depends-on=["_link","_twemoji_db","npmci"] }
 whlbld = { cmd="python -m build --wheel --no-isolation; ls -l dist/*", inputs=["material","package.json"], outputs=["dist/mkdocs_material-*-py3-none-any.whl"] }
-_checkout = "git checkout material/templates/.icons/material/LICENSE material/overrides/assets/javascripts/iconsearch_index.json"
-gs = { cmd = "git status", depends-on = ["_checkout"] }
+_renormalize = "git add --renormalize ."
+gs = { cmd = "git status", depends-on = ["_renormalize"] }
 
 [feature.recommended.dependencies]
 mkdocs-redirects = ">=1.2.1,<2"
